@@ -2,7 +2,7 @@ import fs from "fs";
 import path from "path";
 import Busboy from "busboy";
 
-const UPLOAD_DIR = "C:/Users/Yogi/Desktop/8Dec/uploads";
+const UPLOAD_DIR = "D:/yogi/IW Uploads";
 
 // Ensure upload folder exists
 if (!fs.existsSync(UPLOAD_DIR)) {

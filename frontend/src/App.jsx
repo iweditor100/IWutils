@@ -1,16 +1,19 @@
 import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
+import { Route, Routes } from 'react-router-dom'
 
 import ImageUploader from './components/ImageUploader'
+import { useAuth } from './hooks/authHook'
+import Dashboard from './pages/Dashboard';
+import Login from './pages/Login';
 
 function App() {
+  const {isAuthenticated} = useAuth();
   const [count, setCount] = useState(0)
 
   return (
     <>  
       <div>
-        <ImageUploader/>
+        {isAuthenticated ? <Dashboard/> : <Login/>}
       </div>
     </>
   )
