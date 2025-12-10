@@ -5,7 +5,7 @@ import { useAuth } from "../hooks/authHook";
 const backendURL = import.meta.env.VITE_BACKEND_API;
 export default function GoogleLoginButton() {
     const {loginUser} = useAuth();
-    console.log("CLIENT ID IN FRONTEND:", import.meta.env.VITE_GOOGLE_CLIENT_ID);
+    
 
 
     useEffect(() => {
@@ -30,17 +30,19 @@ export default function GoogleLoginButton() {
         if (!window.google) return;
 
         google.accounts.id.initialize({
-        client_id: import.meta.env.VITE_GOOGLE_CLIENT_ID,
-        callback: handleGoogleLogin,
+            client_id: import.meta.env.VITE_GOOGLE_CLIENT_ID,
+            callback: handleGoogleLogin,
         });
 
         google.accounts.id.renderButton(
-        document.getElementById("googleBtn"),
-        { theme: "filled_blue", size: "large" }
+            document.getElementById("googleBtn"),
+            { theme: "filled_blue", size: "large" }
         );
     };
 
     const handleGoogleLogin = async (response) => {
+
+        console.log("Google call back triggered!");
         try {
             const res = await axios.post(
                 `${backendURL}/auth/google`,
