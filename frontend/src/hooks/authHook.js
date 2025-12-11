@@ -1,33 +1,27 @@
-import {useSelector, useDispatch} from 'react-redux'
+import { useSelector, useDispatch } from 'react-redux'
 import { loginSuccess, logout } from '../store/authSlice'
 
 export function useAuth() {
     const dispatch = useDispatch();
-    const {user, accessToken, isAuthenticated} = useSelector(
+
+    const { user, accessToken, isAuthenticated, loadingAuth } = useSelector(
         (state) => state.auth
     );
-
-
 
     const loginUser = (data) => {
         dispatch(loginSuccess(data));
     };
 
-
     const logoutUser = () => {
         dispatch(logout());
     };
 
-
-
     return {
-        user, 
-        accessToken, 
+        user,
+        accessToken,
         isAuthenticated,
+        loadingAuth,     
         loginUser,
         logoutUser,
     }
 }
-
-
-

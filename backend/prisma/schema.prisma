@@ -7,19 +7,23 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-
-
-
-
-
-
 model User {
-  id    Int @id @default(autoincrement())
-  name  String?
-  email String @unique
-  picture String?
-  googleId String? @unique
+  id        Int      @id @default(autoincrement())
+  name      String?
+  email     String   @unique
+  picture   String?
+  googleId  String?  @unique
   createdAt DateTime @default(now())
+
+  // relation
+  refreshTokens RefreshToken[]
 }
 
-
+model RefreshToken {
+  id        String   @id @default(uuid())
+  tokenHash String
+  userId    Int
+  user      User     @relation(fields: [userId], references: [id])
+  createdAt DateTime @default(now())
+  expiresAt DateTime
+}

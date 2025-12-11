@@ -1,10 +1,11 @@
 import { createSlice } from '@reduxjs/toolkit'
+
 const initialState = {
     user: null,
-    accessToken: null, 
+    accessToken: null,
     isAuthenticated: false,
+    loadingAuth: true,   // to avoid flicker
 };
-
 
 const authSlice = createSlice({
     name: "auth",
@@ -17,16 +18,17 @@ const authSlice = createSlice({
             state.isAuthenticated = true;
         },
 
-
         logout: (state) => {
             state.user = null;
             state.accessToken = null;
-            state.isAuthenticated = false
+            state.isAuthenticated = false;
         },
+
+        finishLoading: (state) => {
+            state.loadingAuth = false;
+        }
     }
 });
 
-
-
-export const {loginSuccess, logout} = authSlice.actions;
+export const { loginSuccess, logout, finishLoading } = authSlice.actions;
 export default authSlice.reducer;
