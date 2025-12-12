@@ -8,7 +8,7 @@ const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
 // GOOGLE LOGIN
 export const googleLogin = async (req, res) => {
-    const { credential } = req.body; 
+    const { credential } = req.body;
 
     const ticket = await client.verifyIdToken({
         idToken: credential,
@@ -70,63 +70,36 @@ export const googleLogin = async (req, res) => {
 // REFRESH TOKEN (ROTATION)
 export const refreshToken = async (req, res) => {
     const token = req.cookies.refreshToken;
-    if (!token) {
-        return res.sendStatus(401); 
-    }
+    if (!token) return res.sendStatus(401);
 
+    // 1. Verify Signature
     let decoded;
     try {
         decoded = jwt.verify(token, process.env.REFRESH_TOKEN_SERVICE);
-    } catch {
-        return res.sendStatus(403); 
+    } catch (e) {
+        return res.sendStatus(403);
     }
 
+    // 2. Find Token in DB (by User ID)
     const stored = await prisma.refreshToken.findFirst({
         where: { userId: decoded.id }
     });
 
-    if (!stored) {
-        return res.sendStatus(403); 
-    }
+    if (!stored) return res.sendStatus(403); // No token record for this user
 
-    // compare raw refreshToken with hashed DB token
+    // 3. Security: Compare Hash (Make sure this is the VALID token we issued)
     const isValid = await compareToken(token, stored.tokenHash);
     if (!isValid) return res.sendStatus(403);
 
-    const user = await prisma.user.findUnique({
-        where: { id: decoded.id }
-    });
+    // 4. User Check
+    const user = await prisma.user.findUnique({ where: { id: decoded.id } });
+    if (!user) return res.sendStatus(404);
 
-    if (!user) {
-        return res.sendStatus(404); 
-    }
-
-    // rotate token
-    // const newRefreshToken = createRefreshToken(user);
+    // 5. Stable Refresh: Issue new Access Token (Keep Refresh Token alive)
     const newAccessToken = createAccessToken(user);
-    // const newHash = await hashToken(newRefreshToken);
-
-    // await prisma.refreshToken.deleteMany({
-    //     where: { userId: user.id }
-    // });
-
-    // await prisma.refreshToken.create({
-    //     data: {
-    //         userId: user.id,
-    //         tokenHash: newHash,
-    //         expiresAt: new Date(Date.now() + 7 * 24 * 3600000)
-    //     }
-    // });
-
-    // res.cookie("refreshToken", newRefreshToken, {
-    //     httpOnly: true,
-    //     secure: true,
-    //     sameSite: "strict",
-    //     maxAge: 7 * 24 * 3600000
-    // });
 
     return res.json({
-        message: "Refreshed the Access Token",
+        message: "Refreshed",
         accessToken: newAccessToken,
         user
     });

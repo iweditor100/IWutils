@@ -8,6 +8,7 @@ export function useAuth() {
         (state) => state.auth
     );
 
+
     const loginUser = (data) => {
         dispatch(loginSuccess(data));
     };
@@ -20,7 +21,7 @@ export function useAuth() {
         user,
         accessToken,
         isAuthenticated,
-        loadingAuth,     
+        loadingAuth,
         loginUser,
         logoutUser,
     }
